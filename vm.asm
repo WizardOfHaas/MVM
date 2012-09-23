@@ -96,7 +96,7 @@ ret
 
 vmhud:
 	pusha
-	movzx ax,byte[di + 15]
+	mov ax,dx
 	call tostring
 	mov si,ax
 	call print
@@ -166,6 +166,8 @@ runop:
 	je .call
 	cmp byte[si],15
 	je .ret
+	cmp byte[si],16
+	je .wait
 	cmp byte[si],20
 	je .add
 	cmp byte[si],21
@@ -293,6 +295,17 @@ runop:
 	mov byte[di],al
 	add byte[di + 13],1
 	jmp .done
+.wait
+	add byte[di],2
+	add si,1
+	mov al,byte[si + 1]
+	movzx bx,byte[si]
+	.waitloop
+	call yield
+	call getregs
+	cmp byte[void + 3072 + bx],al
+	je .done
+	jmp .waitloop
 .cmp
 	add byte[di],2
 	add si,1
