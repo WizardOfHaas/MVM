@@ -78,10 +78,8 @@ runcpu:
 	jmp .loop
 .wait
 	call yield
-	movzx ax,byte[di + 5]
-	cmp [doint.caller],ax
+	cmp byte[di + 9],0
 	je .loop
-	mov byte[di + 9],0
 	jmp .wait
 .doint
 	mov al,byte[.int]
@@ -384,9 +382,26 @@ runop:
 	popa
 ret
 
+clearW:
+	pusha
+	mov di,nodemaster.cpulist
+.loop
+	cmp word[di],0
+	je .done
+	mov si,word[di]
+	add di,2
+	cmp byte[si + 9],'W'
+	jne .loop
+	mov byte[si + 9],0
+	jmp .loop
+.done
+	popa
+ret
+
 doint:
 	pusha
 	mov [.caller],dx
+	call clearW
 	cmp al,1
 	je .push2
 	cmp al,2
