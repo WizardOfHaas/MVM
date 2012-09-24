@@ -307,7 +307,6 @@ runop:
 	.waitloop
 	movzx bx,byte[void + 3072 + bx]
 	cmp byte[void + 3072 + bx],al
-	call getregs
 	je .waitdone
 	call yield
 	jmp .waitloop
