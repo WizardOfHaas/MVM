@@ -132,6 +132,8 @@ runop:
 	mov dx,si
 	mov si,[di]
 	add si,dx
+	cmp byte[di + 9],'w'
+	je .waitloop
 	add byte[di],1
 	
 	cmp byte[si],0
@@ -296,16 +298,22 @@ runop:
 	add byte[di + 13],1
 	jmp .done
 .wait
+	mov byte[di + 9],'w'
 	add byte[di],2
 	add si,1
+	xor ax,ax
 	mov al,byte[si + 1]
 	movzx bx,byte[si]
 	.waitloop
-	call yield
-	call getregs
+	movzx bx,byte[void + 3072 + bx]
 	cmp byte[void + 3072 + bx],al
-	je .done
+	call getregs
+	je .waitdone
+	call yield
 	jmp .waitloop
+.waitdone
+	mov byte[di + 9],0
+	jmp .done
 .cmp
 	add byte[di],2
 	add si,1
