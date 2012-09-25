@@ -78,9 +78,9 @@ runcpu:
 	jmp .loop
 .wait
 	call yield
-	cmp byte[di + 9],0
-	je .loop
-	jmp .wait
+	cmp byte[di + 9],'W'
+	je .wait
+	jmp .loop
 .doint
 	mov al,byte[.int]
 	mov byte[.int],0
@@ -118,6 +118,10 @@ vmhud:
 	call print
 	call printcol
 	movzx ax,byte[di + 11]
+	call tostring
+	mov si,ax
+	call print
+	movzx ax,byte[di + 9]
 	call tostring
 	mov si,ax
 	call print
@@ -237,7 +241,7 @@ runop:
 	movzx bx,byte[si]
 	add bx,void + 3072
 	mov al,byte[bx]
-	cmp byte[si -1],1
+	cmp byte[si - 1],1
 	je .getmem1
 	mov byte[di + 3],al
 	jmp .done
@@ -375,7 +379,7 @@ runop:
 	mov al,byte[si + 1]
 	mov ah,byte[di + 15]
 	mov byte[runcpu.int],al
-	mov byte[nodemaster.ipu],ah
+	mov [doint.caller],di
 	jmp .done
 .nop
 .done
@@ -384,14 +388,16 @@ ret
 
 clearW:
 	pusha
-	mov di,nodemaster.cpulist
+	xor bx,bx
 .loop
-	cmp word[di],0
+	cmp word[nodemaster.cpulist + bx],0
 	je .done
-	mov si,word[di]
-	add di,2
+	call err
+	mov si,word[nodemaster.cpulist + bx]
+	add bx,2
 	cmp byte[si + 9],'W'
 	jne .loop
+	call getregs
 	mov byte[si + 9],0
 	jmp .loop
 .done
@@ -400,7 +406,7 @@ ret
 
 doint:
 	pusha
-	mov [.caller],dx
+	mov dx,[.caller]
 	call clearW
 	cmp al,1
 	je .push2
@@ -408,8 +414,7 @@ doint:
 	je .wait
 	jmp .done
 .push2
-	mov bx,dx
-	mov di,word[nodemaster.cpulist + bx]
+	mov di,dx
 	movzx bx,byte[di + 3]
 	mov si,word[nodemaster.cpulist + bx]
 	xor ax,ax
@@ -417,8 +422,7 @@ doint:
 	mov byte[di + 5],al
 	jmp .done
 .wait
-	mov bx,dx
-	mov di,word[nodemaster.cpulist + bx]
+	mov di,dx
 	mov byte[di + 9],'W'
 	jmp .done
 .done	
