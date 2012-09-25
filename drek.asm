@@ -23,7 +23,7 @@ Init:
 	mov sp,0FFFFh
 	sti
 
-	mov byte[doterm],1	
+	;mov byte[doterm],1	
 
 	cmp byte[iscrash],1
 	je bsod

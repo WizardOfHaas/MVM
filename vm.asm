@@ -392,12 +392,10 @@ clearW:
 .loop
 	cmp word[nodemaster.cpulist + bx],0
 	je .done
-	call err
 	mov si,word[nodemaster.cpulist + bx]
 	add bx,2
 	cmp byte[si + 9],'W'
 	jne .loop
-	call getregs
 	mov byte[si + 9],0
 	jmp .loop
 .done
