@@ -52,8 +52,6 @@ startvm:
 
 	mov word[nodemaster.cpulist],cpu0
 	mov word[nodemaster.romlist],ram0
-	mov word[nodemaster.cpulist + 2],cpu1
-	mov word[nodemaster.romlist + 2],ram1
 	call nodemaster
 
 	call killque
@@ -172,6 +170,8 @@ runop:
 	je .ret
 	cmp byte[si],16
 	je .wait
+	cmp byte[si],17
+	je .run
 	cmp byte[si],20
 	je .add
 	cmp byte[si],21
@@ -315,6 +315,14 @@ runop:
 .waitdone
 	mov byte[di + 9],0
 	jmp .done
+.run
+	movzx bx,byte[si + 1]
+	mov si,void + 3072 + bx
+	call getregs
+	call runop
+	call vmhud
+	add byte[di],1
+	jmp .done
 .cmp
 	add byte[di],2
 	add si,1
@@ -405,11 +413,12 @@ ret
 doint:
 	pusha
 	mov dx,[.caller]
-	call clearW
 	cmp al,1
 	je .push2
 	cmp al,2
 	je .wait
+	cmp al,3
+	je .endlich
 	jmp .done
 .push2
 	mov di,dx
@@ -422,6 +431,9 @@ doint:
 .wait
 	mov di,dx
 	mov byte[di + 9],'W'
+	jmp .done
+.endlich
+	call clearW
 	jmp .done
 .done	
 	popa
