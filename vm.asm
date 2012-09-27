@@ -41,6 +41,10 @@ nodemaster:
 	call yield
 	jmp .runloop
 .done
+	mov si,ram
+	mov di,cpu0
+	call runop
+	call vmhud
 ret
 	.cpulist times 8 db 0
 	.romlist times 8 db 0
@@ -135,7 +139,9 @@ runop:
 	cmp byte[di + 9],'w'
 	je .waitloop
 	add byte[di],1
-	
+	movzx ax,byte[si]
+	call getregs
+
 	cmp byte[si],0
 	je .stop
 	cmp byte[si],1
@@ -239,7 +245,7 @@ runop:
 	add byte[di],2
 	add si,2
 	movzx bx,byte[si]
-	add bx,void + 3072
+	add bx,ram
 	mov al,byte[bx]
 	cmp byte[si - 1],1
 	je .getmem1
@@ -252,7 +258,7 @@ runop:
 	add byte[di],2
 	add si,2
 	movzx bx,byte[si]
-	add bx,void + 3072
+	add bx,ram
 	cmp byte[si -1],1
 	je .setmem1
 	mov al,byte[di + 3]
@@ -288,13 +294,13 @@ runop:
 	movzx bx,byte[di + 13]
 	mov al,byte[di]
 	add al,2
-	add bx,void + 3072
+	add bx,ram
 	mov byte[bx],bl
 	sub byte[di + 13],1
 	jmp .jmp
 .ret
 	movzx bx,byte[di + 13]
-	add bx,void + 3072
+	add bx,ram
 	mov al,byte[bx]
 	mov byte[di],al
 	add byte[di + 13],1
@@ -307,8 +313,8 @@ runop:
 	mov al,byte[si + 1]
 	movzx bx,byte[si]
 	.waitloop
-	movzx bx,byte[void + 3072 + bx]
-	cmp byte[void + 3072 + bx],al
+	movzx bx,byte[ram + bx]
+	cmp byte[ram + bx],al
 	je .waitdone
 	call yield
 	jmp .waitloop
@@ -317,7 +323,9 @@ runop:
 	jmp .done
 .run
 	movzx bx,byte[si + 1]
-	mov si,void + 3072 + bx
+	mov si,ram
+	add si,bx
+	mov si,.somedata
 	call getregs
 	call runop
 	call vmhud
@@ -439,3 +447,5 @@ doint:
 	popa
 ret
 	.caller db 0,0
+
+ram times 256 db 0
