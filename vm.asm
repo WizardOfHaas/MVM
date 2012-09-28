@@ -325,10 +325,11 @@ runop:
 	movzx bx,byte[si + 1]
 	mov si,ram
 	add si,bx
-	mov si,.somedata
+	mov al,byte[di]
 	call getregs
 	call runop
 	call vmhud
+	mov byte[di],al
 	add byte[di],1
 	jmp .done
 .cmp
