@@ -41,10 +41,6 @@ nodemaster:
 	call yield
 	jmp .runloop
 .done
-	mov si,ram
-	mov di,cpu0
-	call runop
-	call vmhud
 ret
 	.cpulist times 8 db 0
 	.romlist times 8 db 0
@@ -139,8 +135,6 @@ runop:
 	cmp byte[di + 9],'w'
 	je .waitloop
 	add byte[di],1
-	movzx ax,byte[si]
-	call getregs
 
 	cmp byte[si],0
 	je .stop
@@ -325,10 +319,13 @@ runop:
 	movzx bx,byte[si + 1]
 	mov si,ram
 	add si,bx
-	mov si,.somedata
-	call getregs
+	mov si,ram
+	mov al,byte[di]
+	movzx bx,byte[di]
+	sub si,bx
 	call runop
 	call vmhud
+	mov byte[di],al
 	add byte[di],1
 	jmp .done
 .cmp
