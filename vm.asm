@@ -52,6 +52,8 @@ startvm:
 
 	mov word[nodemaster.cpulist],cpu0
 	mov word[nodemaster.romlist],ram0
+	mov word[nodemaster.cpulist + 2],cpu1
+	mov word[nodemaster.romlist + 2],ram1
 	call nodemaster
 
 	call killque
@@ -129,9 +131,9 @@ ret
 
 runop:
 	pusha
-	mov dx,si
+	mov cx,si
 	mov si,[di]
-	add si,dx
+	add si,cx
 	cmp byte[di + 9],'w'
 	je .waitloop
 	add byte[di],1
