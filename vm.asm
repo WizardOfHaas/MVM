@@ -319,10 +319,12 @@ runop:
 	jmp .done
 .run
 	movzx bx,byte[si + 1]
+	cmp bx,255
+	je .runreg
 	mov si,ram
 	add si,bx
-	mov si,ram
 	mov al,byte[di]
+	.regok
 	movzx bx,byte[di]
 	sub si,bx
 	call runop
@@ -330,6 +332,21 @@ runop:
 	mov byte[di],al
 	add byte[di],1
 	jmp .done
+.runreg
+	push dx
+	push di
+	movzx bx,byte[si + 2]
+	mov ax,2
+	mul bx
+	add ax,3
+	add di,ax
+	movzx si,byte[di]
+	add si,ram
+	pop di
+	pop dx
+	mov al,byte[di]
+	add al,1
+	jmp .regok
 .cmp
 	add byte[di],2
 	add si,1
@@ -447,4 +464,7 @@ doint:
 ret
 	.caller db 0,0
 
-ram times 256 db 0
+ram:
+db 01,01,03
+db 01,00,02
+times 256 db 0
