@@ -34,6 +34,11 @@ nodemaster:
 	call schedule
 	call getregs
 	add bx,2
+	cmp word[.romlist + bx],0
+	je .runloop
+	cmp word[.cpulist + bx],0
+	je .runloop
+	add byte[.numvm],2
 	jmp .schedloop
 .runloop
 	cmp byte[startvm.comp],2
@@ -45,7 +50,7 @@ ret
 	.cpulist times 8 db 0
 	.romlist times 8 db 0
 	.int db 0,0
-	.ipu db 0,0
+	.numvm db 0,0
 
 startvm:
 	call killque
@@ -178,10 +183,14 @@ runop:
 	je .add
 	cmp byte[si],21
 	je .inc
+	cmp byte[si],22
+	je .addreg
 	cmp byte[si],23
 	je .sub
 	cmp byte[si],24
 	je .dec
+	cmp byte[si],25
+	je .subreg
 	cmp byte[si],30
 	je .int
 .stop
@@ -212,18 +221,12 @@ runop:
 	mov byte[di + 5],al
 	jmp .done
 .set
-	add si,1
-	cmp byte[si],0xFF
-	je .mov
 	add byte[di],2
-	cmp byte[si],1
-	je .set1
-	mov al,byte[si + 1]
-	mov byte[di + 3],al
-	jmp .done
-.set1
-	mov al,byte[si + 1]
-	mov byte[di + 5],al
+	movzx bx,[si + 1]
+	call calcreg
+	add di,ax
+	mov bl,byte[si + 2]
+	mov byte[di],bl
 	jmp .done
 .and
 	mov al,byte[di + 3]
@@ -239,30 +242,23 @@ runop:
 	jmp .done
 .getmem
 	add byte[di],2
-	add si,2
-	movzx bx,byte[si]
+	movzx bx,byte[si + 1]
+	call calcreg
+	movzx bx,[si + 2]
 	add bx,ram
-	mov al,byte[bx]
-	cmp byte[si - 1],1
-	je .getmem1
-	mov byte[di + 3],al
-	jmp .done
-.getmem1
-	mov byte[di + 5],al
+	mov cl,byte[bx]
+	add di,ax
+	mov byte[di],cl
 	jmp .done
 .setmem
 	add byte[di],2
-	add si,2
-	movzx bx,byte[si]
+	movzx bx,byte[si + 1]
+	call calcreg
+	movzx bx,[si + 2]
 	add bx,ram
-	cmp byte[si -1],1
-	je .setmem1
-	mov al,byte[di + 3]
-	mov byte[bx],al
-	jmp .done
-.setmem1
-	mov al,byte[di + 5]
-	mov byte[bx],al
+	add di,ax
+	mov cl,byte[di]
+	mov byte[bx],cl
 	jmp .done
 .jmp
 	add si,1
@@ -336,9 +332,7 @@ runop:
 	push dx
 	push di
 	movzx bx,byte[si + 2]
-	mov ax,2
-	mul bx
-	add ax,3
+	call calcreg
 	add di,ax
 	movzx si,byte[di]
 	add si,ram
@@ -380,31 +374,45 @@ runop:
 	add al,ah
 	mov byte[di + 7],al
 	jmp .done
+.addreg
+	movzx bx,byte[si + 1]
+	call calcreg
+	push di
+	mov bl,byte[si + 2]
+	add di,ax
+	add byte[di],bl
+	pop di
+	add byte[di],2
+	jmp .done
 .sub
 	mov al,byte[di + 3]
 	mov ah,byte[di + 5]
 	sub al,ah
 	mov byte[di + 7],al
 	jmp .done
+.subreg
+	movzx bx,byte[si + 1]
+	call calcreg
+	push di
+	mov bl,byte[si + 2]
+	add di,ax
+	sub byte[di],bl
+	pop di
+	add byte[di],2
+	jmp .done
 .inc
 	add byte[di],1
-	add si,1
-	cmp byte[si],1
-	je .inc1
-	add byte[di + 3],1
-	jmp .done
-.inc1
-	add byte[di + 7],1
+	movzx bx,byte[si + 1]
+	call calcreg
+	add di,ax
+	add byte[di],1
 	jmp .done
 .dec
 	add byte[di],1
-	add si,1
-	cmp byte[si],1
-	je .dec1
-	sub byte[di + 3],1
-	jmp .done
-.dec1
-	sub byte[di + 7],1
+	movzx bx,byte[si + 1]
+	call calcreg
+	add di,ax
+	sub byte[di],1
 	jmp .done
 .int
 	add byte[di],1
@@ -416,6 +424,12 @@ runop:
 .nop
 .done
 	popa
+ret
+
+calcreg:
+	mov ax,2
+	mul bx
+	add ax,3
 ret
 
 clearW:
@@ -438,19 +452,16 @@ doint:
 	pusha
 	mov dx,[.caller]
 	cmp al,1
-	je .push2
+	je .getcpulist
 	cmp al,2
 	je .wait
 	cmp al,3
 	je .endlich
 	jmp .done
-.push2
+.getcpulist
 	mov di,dx
-	movzx bx,byte[di + 3]
-	mov si,word[nodemaster.cpulist + bx]
-	xor ax,ax
-	mov al,byte[si + 5]
-	mov byte[di + 5],al
+	mov al,byte[nodemaster.numvm]
+	mov byte[di + 3],al
 	jmp .done
 .wait
 	mov di,dx
@@ -465,6 +476,4 @@ ret
 	.caller db 0,0
 
 ram:
-db 01,01,03
-db 01,00,02
 times 256 db 0
