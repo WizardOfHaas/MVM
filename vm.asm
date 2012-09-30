@@ -197,28 +197,18 @@ runop:
 	mov byte[di + 9],'S'
 	jmp .done
 .mov
-	add si,2
+	mov cx,di
 	add byte[di],2
-	cmp byte[si - 1],1
-	je .mov1
-	cmp byte[si],1
-	je .mov01
-	mov al,byte[di + 7]
-	mov byte[di + 3],al
-	jmp .done
-.mov01
-	mov al,byte[di + 5]
-	mov byte[di + 3],al
-	jmp .done
-.mov1
-	cmp byte[si],0
-	je .mov10
-	mov al,byte[di + 7]
-	mov byte[di + 5],al
-	jmp .done
-.mov10
-	mov al,byte[di + 3]
-	mov byte[di + 5],al
+	movzx bx,byte[si + 1]
+	call calcreg
+	add di,ax
+	movzx bx,byte[si + 2]
+	call calcreg
+	mov bx,ax
+	add bx,cx
+	xor ax,ax
+	mov al,byte[bx]
+	mov byte[di],al
 	jmp .done
 .set
 	add byte[di],2
@@ -261,26 +251,29 @@ runop:
 	mov byte[bx],cl
 	jmp .done
 .jmp
-	add si,1
-	mov al,byte[si]
+	mov al,byte[si + 1]
 	sub al,1
 	mov byte[di],al
 	jmp .done
 .jne
 	cmp byte[di + 11],1
 	jne .jmp
+	add byte[di],1
 	jmp .done
 .je
 	cmp byte[di + 11],1
 	je .jmp
+	add byte[di],1
 	jmp .done
 .jg
 	cmp byte[di + 11],2
 	je .jmp
+	add byte[di],1
 	jmp .done
 .jl
 	cmp byte[di + 11],3
 	je .jmp
+	add byte[di],1
 	jmp .done
 .call
 	movzx bx,byte[di + 13]
@@ -343,15 +336,12 @@ runop:
 	jmp .regok
 .cmp
 	add byte[di],2
-	add si,1
-	mov ah,byte[si + 1]
-	cmp byte[si],1
-	je .cmp1
-	mov al,byte[di + 3]
-	jmp .docmp
-.cmp1
-	mov al,byte[di + 3]
-	jmp .docmp
+	movzx bx,byte[si + 1]
+	call calcreg
+	add ax,di
+	mov bx,ax
+	mov al,byte[bx]
+	mov ah,byte[si + 2]
 .docmp
 	cmp al,ah
 	je .cmpe
