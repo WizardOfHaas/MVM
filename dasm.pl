@@ -60,16 +60,19 @@ sub mov
 	}
 	else
 	{
-	   $a0 = substr @args[0],1;
-           $a1 = substr @args[1],1;
-	   print output "db 09,",$a0,",",$a1,"\r\n";
+	    if ($a1 =~ /r/ and $a0 =~ /r/)
+	    {
+     	        $a0 = substr @args[0],1;
+                $a1 = substr @args[1],1;
+	        print output "db 09,",$a0,",",$a1,"\r\n";
+	    }
+	    else
+	    {
+		$a0 = substr @args[0],1;
+		$a1 = @args[1];
+		print output "db 01,",$a0,",",$a1,"\r\n";
+	    }
 	}
-    }
-    else
-    {
-	$a0 = substr @args[0],1;
-	$a1 = @args[1];
-	print output "db 01,",$a0,",",$a1,"\r\n";
     }
 }
 
