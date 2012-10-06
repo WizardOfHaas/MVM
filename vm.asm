@@ -1,3 +1,13 @@
+cpu2:
+	.ip db 0,0
+	.0 db 0,0
+	.1 db 0,0
+	.2 db 0,0
+	.stat db 0,0
+	.flag db 0,0
+	.sp db 255,0
+	.id db 1
+times 2 db 0
 cpu1:
 	.ip db 0,0
 	.0 db 0,0
@@ -59,6 +69,8 @@ startvm:
 	mov word[nodemaster.romlist],ram0
 	mov word[nodemaster.cpulist + 2],cpu1
 	mov word[nodemaster.romlist + 2],ram1
+	mov word[nodemaster.cpulist + 4],cpu2
+	mov word[nodemaster.romlist + 4],ram2
 	call nodemaster
 
 	call killque
@@ -252,7 +264,6 @@ runop:
 	jmp .done
 .jmp
 	mov al,byte[si + 1]
-	sub al,1
 	mov byte[di],al
 	jmp .done
 .jne
