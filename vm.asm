@@ -120,10 +120,12 @@ vmhud:
 	call tostring
 	mov si,ax
 	call print
+	call printdash
 	movzx ax,byte[di + 5]
 	call tostring
 	mov si,ax
 	call print
+	call printdash
 	movzx ax,byte[di + 7]
 	call tostring
 	mov si,ax
@@ -145,6 +147,14 @@ vmhud:
 	call printret
 	popa
 ret
+
+printdash:
+	pusha
+	mov si,.dash
+	call print
+	popa
+ret
+	.dash db '-',0
 
 runop:
 	pusha
