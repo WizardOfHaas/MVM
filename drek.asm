@@ -806,8 +806,6 @@ getdump:
         je .done
         int 10h
         add bx,1
-        cmp cx,5
-        je .done
         jmp .repeat
 .done	
 ret

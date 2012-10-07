@@ -215,6 +215,12 @@ runop:
 	je .subreg
 	cmp byte[si],30
 	je .int
+	cmp byte[si],35
+	je .putscreen
+	cmp byte[si],36
+	je .putregscreen
+	cmp byte[si],40
+	je .getkeybd
 .stop
 	mov byte[di + 9],'S'
 	jmp .done
@@ -432,10 +438,40 @@ runop:
 	mov byte[runcpu.int],al
 	mov [doint.caller],di
 	jmp .done
+.putscreen
+	add byte[di],1
+	mov al,byte[si + 1]
+	mov byte[.buf],al
+	.print
+	mov si,.buf
+	mov ah,byte[doterm]
+	mov byte[doterm],0
+	call print
+	mov byte[doterm],ah
+	jmp .done
+.putregscreen
+	add byte[di],1
+	movzx bx,byte[si + 1]
+	call calcreg
+	add di,ax
+	mov al,byte[di]
+	mov byte[.buf],al
+	jmp .print
+.getkeybd
+	add byte[di],1
+	call waitkey
+	push ax
+	movzx bx,byte[si + 1]
+	call calcreg
+	add di,ax
+	pop ax
+	mov byte[di],al
+	jmp .done
 .nop
 .done
 	popa
 ret
+	.buf db 0,0,0
 
 calcreg:
 	mov ax,2
