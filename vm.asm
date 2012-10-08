@@ -175,8 +175,12 @@ runop:
 	je .or
 	cmp byte[si],4
 	je .getmem
+	cmp byte[si],41
+	je .getmemreg
 	cmp byte[si],5
 	je .setmem
+	cmp byte[si],51
+	je .setmemreg
 	cmp byte[si],6
 	je .nop
 	cmp byte[si],7
@@ -268,6 +272,16 @@ runop:
 	add di,ax
 	mov byte[di],cl
 	jmp .done
+.getmemreg
+	add byte[di],2
+	call calc2regs
+	mov si,di
+	add di,ax
+	add si,bx
+	movzx bx,byte[si]
+	mov al,byte[ram + bx]
+	mov byte[di],al
+	jmp .done
 .setmem
 	add byte[di],2
 	movzx bx,byte[si + 1]
@@ -277,6 +291,17 @@ runop:
 	add di,ax
 	mov cl,byte[di]
 	mov byte[bx],cl
+	jmp .done
+.setmemreg
+	add byte[di],2
+	call calc2regs
+	mov si,di
+	add di,ax
+	add si,bx
+	mov al,byte[di]
+	movzx bx,byte[si]
+	call getregs
+	mov byte[ram + bx],al
 	jmp .done
 .jmp
 	mov al,byte[si + 1]
@@ -473,6 +498,16 @@ runop:
 ret
 	.buf db 0,0,0
 
+calc2regs:
+	movzx bx,byte[si + 1]
+	call calcreg
+	push ax
+	movzx bx,byte[si + 2]
+	call calcreg
+	mov bx,ax
+	pop ax
+ret
+
 calcreg:
 	mov ax,2
 	mul bx
@@ -521,6 +556,5 @@ doint:
 	popa
 ret
 	.caller db 0,0
-
 ram:
 times 256 db 0
