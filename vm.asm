@@ -300,7 +300,6 @@ runop:
 	add si,bx
 	mov al,byte[di]
 	movzx bx,byte[si]
-	call getregs
 	mov byte[ram + bx],al
 	jmp .done
 .jmp
@@ -539,6 +538,8 @@ doint:
 	je .wait
 	cmp al,3
 	je .endlich
+	cmp al,4
+	je .tott
 	jmp .done
 .getcpulist
 	mov di,dx
@@ -552,9 +553,28 @@ doint:
 .endlich
 	call clearW
 	jmp .done
+.tott
+	call killvms
+	call killque
+	mov ax,shell
+	call schedule
 .done	
 	popa
 ret
 	.caller db 0,0
+
+killvms:
+	mov si,nodemaster.cpulist
+	xor bx,bx
+.loop
+	mov di,word[nodemaster.cpulist + bx]
+	cmp di,0
+	je .done
+	mov byte[di + 9],'S'
+	add bx,2
+	jmp .loop
+.done
+ret
+
 ram:
 times 256 db 0

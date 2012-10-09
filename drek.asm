@@ -95,6 +95,7 @@ Init:
 
 	call loadints
 	call startvm
+
 main:			;Main command loop
 	call yield
 jmp main
