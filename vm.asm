@@ -227,6 +227,8 @@ runop:
 	je .getkeybd
 .stop
 	mov byte[di + 9],'S'
+	mov ax,dx
+	call kill
 	jmp .done
 .mov
 	mov cx,di
@@ -554,7 +556,7 @@ doint:
 	call clearW
 	jmp .done
 .tott
-	call killvms
+	call killallvms
 	call killque
 	mov ax,shell
 	call schedule
@@ -563,7 +565,7 @@ doint:
 ret
 	.caller db 0,0
 
-killvms:
+killallvms:
 	mov si,nodemaster.cpulist
 	xor bx,bx
 .loop
