@@ -350,6 +350,7 @@ runop:
 	mov byte[.w1],bl
 	mov byte[.w2],al
 .waitloop
+	call err
 	movzx bx,byte[.w1]
 	movzx ax,byte[.w2]
 	movzx cx,byte[ram + bx]
@@ -357,12 +358,12 @@ runop:
 	je .waitdone
 	call yield
 	jmp .waitloop
-.w1 db 0,0
-.w2 db 0,0
 .waitdone
 	add byte[di],2
 	mov byte[di + 9],0
 	jmp .done
+.w1 db 0,0
+.w2 db 0,0
 .run
 	movzx bx,byte[si + 1]
 	cmp bx,255
@@ -565,8 +566,8 @@ doint:
 	call clearW
 	jmp .done
 .tott
-	call killallvms
 	call killque
+	call killallvms
 	mov ax,shell
 	call schedule
 .done	
