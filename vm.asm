@@ -187,6 +187,8 @@ runop:
 	je .jmp
 	cmp byte[si],8
 	je .cmp
+	cmp byte[si],81
+	je .cmpregs
 	cmp byte[si],9
 	je .mov
 	cmp byte[si],10
@@ -227,8 +229,6 @@ runop:
 	je .getkeybd
 .stop
 	mov byte[di + 9],'S'
-	mov ax,dx
-	call kill
 	jmp .done
 .mov
 	mov cx,di
@@ -345,18 +345,22 @@ runop:
 	jmp .done
 .wait
 	mov byte[di + 9],'w'
-	add byte[di],2
-	add si,1
-	xor ax,ax
-	mov al,byte[si + 1]
-	movzx bx,byte[si]
-	.waitloop
-	movzx bx,byte[ram + bx]
-	cmp byte[ram + bx],al
+	mov bl,byte[si + 1]
+	mov al,byte[si + 2]
+	mov byte[.w1],bl
+	mov byte[.w2],al
+.waitloop
+	movzx bx,byte[.w1]
+	movzx ax,byte[.w2]
+	movzx cx,byte[ram + bx]
+	cmp cx,ax
 	je .waitdone
 	call yield
 	jmp .waitloop
+.w1 db 0,0
+.w2 db 0,0
 .waitdone
+	add byte[di],2
 	mov byte[di + 9],0
 	jmp .done
 .run
@@ -387,6 +391,11 @@ runop:
 	mov al,byte[di]
 	add al,1
 	jmp .regok
+.cmpregs
+	add byte[di],2
+	call calc2regs
+	mov ah,bl
+	je .docmp
 .cmp
 	add byte[di],2
 	movzx bx,byte[si + 1]
