@@ -103,6 +103,7 @@ ret
 tasklist:
 	pusha
 	mov bx,taskque
+	mov byte[.any],1
 .loop
 	cmp word[bx],00
 	jne .task
@@ -111,6 +112,7 @@ tasklist:
 	jge .done
 	jmp .loop
 .task
+	mov byte[.any],0
 	push bx
 	mov ax,bx
 	sub ax,taskque
@@ -131,6 +133,7 @@ tasklist:
 .done
 	popa
 ret
+	.any db 0,0
 
 findclearque:
 	mov bx,taskque

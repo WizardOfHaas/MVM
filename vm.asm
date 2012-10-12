@@ -51,10 +51,12 @@ nodemaster:
 	add byte[.numvm],2
 	jmp .schedloop
 .runloop
+	call tasklist
+.run
 	cmp byte[startvm.comp],2
 	je .done
 	call yield
-	jmp .runloop
+	jmp .run
 .done
 ret
 	.cpulist times 8 db 0
@@ -587,10 +589,16 @@ killallvms:
 .loop
 	mov di,word[nodemaster.cpulist + bx]
 	cmp di,0
-	je .done
+	je .wait
 	mov byte[di + 9],'D'
 	add bx,2
 	jmp .loop
+.wait
+	call tasklist
+	cmp byte[tasklist.any],1
+	je .done
+	call yield
+	jmp .wait
 .done
 ret
 
