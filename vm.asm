@@ -85,7 +85,7 @@ ret
 runcpu:
 	pusha
 .loop
-	cmp byte[di + 9],'D'
+	cmp byte[di + 11],'D'
 	je .die
 	cmp byte[di + 9],'S'
 	je .done
@@ -109,6 +109,7 @@ runcpu:
 	jmp .loop
 .die
 	mov ax,dx
+	call getregs
 	call kill
 .done
 	add byte[startvm.comp],1
@@ -165,7 +166,7 @@ ret
 
 runop:
 	pusha
-	cmp byte[di + 9],'D'
+	cmp byte[di + 11],'D'
 	je .done
 	mov cx,si
 	mov si,[di]
@@ -578,6 +579,7 @@ doint:
 	call killallvms
 	mov ax,shell
 	call schedule
+	call tasklist
 .done	
 	popa
 ret
@@ -590,12 +592,12 @@ killallvms:
 	mov di,word[nodemaster.cpulist + bx]
 	cmp di,0
 	je .wait
-	mov byte[di + 9],'D'
+	mov byte[di + 11],'D'
 	add bx,2
 	jmp .loop
 .wait
 	call tasklist
-	cmp byte[tasklist.any],1
+	cmp byte[tasklist.any],0
 	je .done
 	call yield
 	jmp .wait
