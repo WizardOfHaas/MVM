@@ -53,7 +53,7 @@ nodemaster:
 .runloop
 	call tasklist
 .run
-	cmp byte[startvm.comp],2
+	cmp byte[startvm.comp],3
 	je .done
 	call yield
 	jmp .run
@@ -596,8 +596,11 @@ killallvms:
 	add bx,2
 	jmp .loop
 .wait
-	call tasklist
-	cmp byte[tasklist.any],0
+	call findclearque
+	sub bx,taskque
+	call printret
+	call getregs
+	cmp bx,0
 	je .done
 	call yield
 	jmp .wait
