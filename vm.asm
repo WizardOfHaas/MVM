@@ -108,6 +108,8 @@ runcpu:
 	call doint
 	jmp .loop
 .die
+	mov byte[di + 11],0
+	mov byte[di + 9],'S'
 	mov ax,dx
 	call getregs
 	call kill
@@ -364,6 +366,8 @@ runop:
 	movzx bx,byte[.w1]
 	movzx ax,byte[.w2]
 	movzx cx,byte[ram + bx]
+	cmp byte[di + 11],'D'
+	je .waitdone
 	cmp cx,ax
 	je .waitdone
 	call yield
