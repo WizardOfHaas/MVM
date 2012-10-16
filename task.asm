@@ -6,11 +6,6 @@ gotask:
 	call input
 
 	mov di,.file
-	mov si,textedit.list
-	call compare
-	jc .listfiles
-
-	mov di,.file
 	call findfile
 	cmp ax,0
 	je .err

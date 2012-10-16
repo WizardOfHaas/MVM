@@ -67,20 +67,25 @@ ret
 startvm:
 	call killque
 
+	call loadroms
 	mov word[nodemaster.cpulist],cpu0
-	mov word[nodemaster.romlist],ram0
-	mov word[nodemaster.cpulist + 2],cpu1
-	mov word[nodemaster.romlist + 2],ram1
-	mov word[nodemaster.cpulist + 4],cpu2
-	mov word[nodemaster.romlist + 4],ram2
+	mov word[nodemaster.romlist],void + 1024
 	call nodemaster
 
 	call killque
 	mov ax,shell
 	call schedule
 ret
-	.file db 'RUN',0
 	.comp db 0,0
+
+loadroms:
+	pusha
+	mov di,.0
+	mov bx,void + 1024
+	call vfs2disk
+	popa
+ret
+	.0 db 'ROM0',0
 
 runcpu:
 	pusha

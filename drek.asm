@@ -51,9 +51,9 @@ Init:
 	call schedule
 	mov word[shellpid],ax
 
-	;mov si,loaddir
-	;call print
-	;call loadrootdir
+	mov si,loaddir
+	call print
+	call loadrootdir
 
 	call getpit
 	mov [starttime],ax
@@ -145,10 +145,6 @@ getthread:		;Turns command into memory location
 	call compare
 	jc .regscmd
 
-	mov si,lang
-	call compare
-	jc .langcmd
-
 	mov si,task
 	call compare
 	jc .taskcmd
@@ -165,17 +161,9 @@ getthread:		;Turns command into memory location
 	call compare
 	jc .stackcmd
 
-	mov si,dte
-	call compare
-	jc .dtecmd
-
 	mov si,log
 	call compare
 	jc .logcmd
-
-	mov si,file
-	call compare
-	jc .filecmd
 
 	mov si,list
 	call compare
@@ -231,9 +219,6 @@ getthread:		;Turns command into memory location
 .regscmd
 	mov ax,getregs
 	jmp .done
-.langcmd
-	mov ax,dreklang
-	jmp .done
 .taskcmd
 	mov ax,taskman
 	jmp .done
@@ -245,12 +230,6 @@ getthread:		;Turns command into memory location
 	jmp .done
 .stackcmd
 	call printstack
-	jmp .done
-.dtecmd
-	mov ax,textedit
-	jmp .done
-.filecmd
-	mov ax,fileman
 	jmp .done
 .listcmd
 	mov ax,filelist
@@ -329,11 +308,8 @@ ret
 	colors db 02,0,0,0
         buffer times 128 db 0
 
-%INCLUDE "lang.asm"
 %INCLUDE "task.asm"
 %INCLUDE "memc.asm"	
-%INCLUDE "file.asm"
-%INCLUDE "dte.asm"
 %INCLUDE "term.asm"
 %INCLUDE "bFS.asm"
 %INCLUDE "int.asm"

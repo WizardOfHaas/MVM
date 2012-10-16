@@ -13,15 +13,9 @@ shell:
 	.script
 	call findfile
 	cmp ax,0
-	je .langtry
+	je .err
 	call gotask.runcmd
 	cmp ax,'fl'
-	jne .done
-.langtry
-	mov si,buffer
-	call parse
-	call langcommand
-	cmp ax,'nc'
 	jne .done
 .err
 	call err

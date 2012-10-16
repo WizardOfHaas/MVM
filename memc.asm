@@ -138,3 +138,17 @@ memcpy:				;IN - si, source, di, destination, ax, length
 .done
 	popa
 ret
+
+copystring:
+	pusha
+.more:
+	mov al, [si]			
+	mov [di], al
+	inc si
+	inc di
+	cmp byte al, 0			
+	jne .more
+
+.done:
+	popa
+	ret

@@ -538,6 +538,8 @@ vfs2disk:
 	push bx
 	call resetfloppy
 	call findfile
+	cmp ax,0
+	je .err
 	sub bx,6
 	mov ax,word[bx]
 	add ax,31
