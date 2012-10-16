@@ -69,7 +69,10 @@ startvm:
 
 	call loadroms
 	mov word[nodemaster.cpulist],cpu0
+	mov word[nodemaster.cpulist + 2],cpu1
+	mov word[nodemaster.cpulist + 4],cpu2
 	mov word[nodemaster.romlist],void + 1024
+	mov word[nodemaster.romlist + 2],void + 2048
 	call nodemaster
 
 	call killque
@@ -80,12 +83,16 @@ ret
 
 loadroms:
 	pusha
-	mov di,.0
+	mov di,.rom
 	mov bx,void + 1024
+	call vfs2disk
+	mov byte[.rom + 3],'B'
+	mov di,.rom
+	mov bx,void + 2048
 	call vfs2disk
 	popa
 ret
-	.0 db 'ROM0',0
+	.rom db 'ROMA',0
 
 runcpu:
 	pusha
