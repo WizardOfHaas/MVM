@@ -42,7 +42,7 @@ nodemaster:
 	mov di,word[.cpulist + bx]
 	mov ax,runcpu
 	call schedule
-	call getregs
+	;call getregs
 	add bx,2
 	cmp word[.romlist + bx],0
 	je .runloop
@@ -53,14 +53,14 @@ nodemaster:
 .runloop
 	call tasklist
 .run
-	cmp byte[startvm.comp],3
+	cmp byte[startvm.comp],2
 	je .done
 	call yield
 	jmp .run
 .done
 ret
-	.cpulist times 8 db 0
-	.romlist times 8 db 0
+	.cpulist times 16 db 0
+	.romlist times 16 db 0
 	.int db 0,0
 	.numvm db 0,0
 
@@ -68,11 +68,21 @@ startvm:
 	call killque
 
 	call loadroms
-	mov word[nodemaster.cpulist],cpu0
-	mov word[nodemaster.cpulist + 2],cpu1
-	mov word[nodemaster.cpulist + 4],cpu2
+	mov ax,16
+	call maloc
+	call zeroram
+	mov word[nodemaster.cpulist],bx
+	mov ax,16
+	call maloc
+	call zeroram
+	mov word[nodemaster.cpulist + 2],bx
+	mov ax,16
+	call maloc
+	call zeroram
+	mov word[nodemaster.cpulist + 4],bx
 	mov word[nodemaster.romlist],void + 1024
 	mov word[nodemaster.romlist + 2],void + 2048
+	;mov word[nodemaster.romlist + 4],void + 3072
 	call nodemaster
 
 	call killque
@@ -90,6 +100,12 @@ loadroms:
 	mov di,.rom
 	mov bx,void + 2048
 	call vfs2disk
+	mov byte[.rom + 3],'C'
+	mov di,.rom
+	mov bx,void + 3072
+	call vfs2disk
+	
+	call killvfs
 	popa
 ret
 	.rom db 'ROMA',0
@@ -108,7 +124,7 @@ runcpu:
 	call runop
 	call vmhud
 	call yield
-	jmp .loop
+	jmp .done
 .wait
 	call yield
 	cmp byte[di + 9],'W'

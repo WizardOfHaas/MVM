@@ -151,4 +151,18 @@ copystring:
 
 .done:
 	popa
-	ret
+ret
+
+zeroram:
+	pusha
+	call getregs
+	mov di,bx
+.loop
+	cmp di,ax
+	jge .done
+	mov byte[di],0
+	add di,1
+	jmp .loop
+.done	
+	popa
+ret
