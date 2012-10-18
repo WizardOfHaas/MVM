@@ -1061,8 +1061,10 @@ bsod:
 	jge .done
 	jmp .loop
 .done
+	call killque
+	mov ax,shell
+	call schedule
 	call main
-	int 19h
 ret
 
 reboot1:
