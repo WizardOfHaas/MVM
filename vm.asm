@@ -59,8 +59,8 @@ nodemaster:
 	jmp .run
 .done
 ret
-	.cpulist times 16 db 0
-	.romlist times 16 db 0
+	.cpulist times 8 db 0
+	.romlist times 8 db 0
 	.int db 0,0
 	.numvm db 0,0
 
@@ -69,10 +69,16 @@ startvm:
 
 	call loadroms
 	
-	mov word[nodemaster.cpulist],cpu0
-	mov word[nodemaster.cpulist + 2],cpu1
-	mov word[nodemaster.romlist],void + 1024
-	mov word[nodemaster.romlist + 2],void + 2048
+	mov ax,16
+	call maloc
+	call zeroram
+	mov word[nodemaster.cpulist],bx
+	mov ax,16
+	call maloc
+	call zeroram
+	mov word[nodemaster.cpulist + 2],bx
+	mov word[nodemaster.romlist],void + 2048
+	mov word[nodemaster.romlist + 2],void + 3072
 	call nodemaster
 
 	call killque
@@ -84,12 +90,13 @@ ret
 loadroms:
 	pusha
 	mov di,.rom
-	mov bx,void + 1024
+	mov bx,void + 2048
 	call vfs2disk
 	mov byte[.rom + 3],'B'
 	mov di,.rom
-	mov bx,void + 2048
+	mov bx,void + 3072
 	call vfs2disk
+	call killvfs
 	popa
 ret
 	.rom db 'ROMA',0
