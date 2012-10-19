@@ -42,6 +42,7 @@ nodemaster:
 	mov di,word[.cpulist + bx]
 	mov ax,runcpu
 	call schedule
+	call getregs
 	add bx,2
 	cmp word[.romlist + bx],0
 	je .runloop
@@ -67,27 +68,11 @@ startvm:
 	call killque
 
 	call loadroms
-	mov ax,16
-	call maloc
-	call zeroram
-	;mov ax,void + 60
-	;mov bx,void + 40
-	;call zeroram
-	mov word[nodemaster.cpulist],bx ;void + 40
-	mov ax,16
-	call maloc
-	call zeroram
-	;mov ax,void + 100
-	;mov bx,void + 80
-	;call zeroram
-	mov word[nodemaster.cpulist + 2],bx ;void + 80
 	
-	mov si,void
-	call getdump
-	
+	mov word[nodemaster.cpulist],cpu0
+	mov word[nodemaster.cpulist + 2],cpu1
 	mov word[nodemaster.romlist],void + 1024
 	mov word[nodemaster.romlist + 2],void + 2048
-	;mov word[nodemaster.romlist + 4],void + 3072
 	call nodemaster
 
 	call killque
@@ -105,12 +90,6 @@ loadroms:
 	mov di,.rom
 	mov bx,void + 2048
 	call vfs2disk
-	mov byte[.rom + 3],'C'
-	mov di,.rom
-	mov bx,void + 3072
-	;call vfs2disk
-	
-	call killvfs
 	popa
 ret
 	.rom db 'ROMA',0

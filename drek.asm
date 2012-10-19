@@ -1062,6 +1062,13 @@ bsod:
 	jmp .loop
 .done
 	call killque
+
+	cli
+	mov ax,0
+	mov ss,ax
+	mov sp,0FFFFh
+	sti
+
 	mov ax,shell
 	call schedule
 	call main
