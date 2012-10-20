@@ -155,7 +155,6 @@ ret
 
 zeroram:
 	pusha
-	call getregs
 	mov di,bx
 .loop
 	cmp di,ax

@@ -35,8 +35,6 @@ nodemaster:
 .schedloop
 	cmp word[.romlist + bx],0
 	je .runloop
-	cmp word[.cpulist + bx],0
-	je .runloop
 	mov dx,bx
 	mov si,word[.romlist + bx]
 	mov di,word[.cpulist + bx]
@@ -64,19 +62,25 @@ ret
 	.int db 0,0
 	.numvm db 0,0
 
+alocvm:
+	pusha
+	mov si,bx
+	mov ax,16
+	call maloc
+	call zeroram
+	mov word[nodemaster.cpulist + si],bx
+	popa	
+ret
+
 startvm:
 	call killque
 
 	call loadroms
 	
-	mov ax,16
-	call maloc
-	call zeroram
-	mov word[nodemaster.cpulist],bx
-	mov ax,16
-	call maloc
-	call zeroram
-	mov word[nodemaster.cpulist + 2],bx
+	mov bx,0
+	call alocvm
+	mov bx,2
+	call alocvm
 	mov word[nodemaster.romlist],void + 2048
 	mov word[nodemaster.romlist + 2],void + 3072
 	call nodemaster
