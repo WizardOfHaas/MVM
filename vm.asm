@@ -72,17 +72,26 @@ alocvm:
 	popa	
 ret
 
+alocallvm:
+	xor bx,bx
+.loop
+	cmp bx,6
+	jge .done
+	call alocvm
+	add bx,2
+	jmp .loop
+.done
+ret
+
 startvm:
 	call killque
 
 	call loadroms
 	
-	mov bx,0
-	call alocvm
-	mov bx,2
-	call alocvm
+	call alocallvm
 	mov word[nodemaster.romlist],void + 2048
-	mov word[nodemaster.romlist + 2],void + 3072
+	mov word[nodemaster.romlist + 2],void + 2560
+	mov word[nodemaster.romlist + 4],void + 3072
 	call nodemaster
 
 	call killque
@@ -97,6 +106,10 @@ loadroms:
 	mov bx,void + 2048
 	call vfs2disk
 	mov byte[.rom + 3],'B'
+	mov di,.rom
+	mov bx,void + 2560
+	call vfs2disk
+	mov byte[.rom + 3],'C'
 	mov di,.rom
 	mov bx,void + 3072
 	call vfs2disk
