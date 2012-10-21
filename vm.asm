@@ -87,11 +87,7 @@ startvm:
 	call killque
 
 	call loadroms
-	
 	call alocallvm
-	mov word[nodemaster.romlist],void + 2048
-	mov word[nodemaster.romlist + 2],void + 2560
-	mov word[nodemaster.romlist + 4],void + 3072
 	call nodemaster
 
 	call killque
@@ -102,18 +98,24 @@ ret
 
 loadroms:
 	pusha
-	mov di,.rom
 	mov bx,void + 2048
-	call vfs2disk
-	mov byte[.rom + 3],'B'
 	mov di,.rom
-	mov bx,void + 2560
+	xor si,si
+.loop
+	call getregs
 	call vfs2disk
-	mov byte[.rom + 3],'C'
-	mov di,.rom
-	mov bx,void + 3072
-	call vfs2disk
+	cmp ax,'er'
+	je .done
+	mov word[nodemaster.romlist + si],bx
+	add si,2
+	cmp byte[.rom + 3],'C'
+	jge .done
+	add byte[.rom + 3],1
+	add bx,512
+	jmp .loop
+.done
 	call killvfs
+	call printret
 	popa
 ret
 	.rom db 'ROMA',0

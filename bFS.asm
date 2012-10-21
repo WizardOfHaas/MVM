@@ -565,6 +565,7 @@ vfs2disk:
 	popa
 .err
 	call err
+	mov ax,'er'
 .done
 	popa
 ret
