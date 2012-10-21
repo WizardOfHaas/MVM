@@ -86,9 +86,15 @@ ret
 startvm:
 	call killque
 
+	mov byte[startvm.comp],0
+	call loadrootdir
 	call loadroms
 	call alocallvm
 	call nodemaster
+
+	mov si,void + 20
+	mov dx,void + 3584
+	call memclear
 
 	call killque
 	mov ax,shell
