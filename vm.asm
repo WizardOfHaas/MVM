@@ -1,33 +1,3 @@
-cpu2:
-	.ip db 0,0
-	.0 db 0,0
-	.1 db 0,0
-	.2 db 0,0
-	.stat db 0,0
-	.flag db 0,0
-	.sp db 255,0
-	.id db 1
-times 2 db 0
-cpu1:
-	.ip db 0,0
-	.0 db 0,0
-	.1 db 0,0
-	.2 db 0,0
-	.stat db 0,0
-	.flag db 0,0
-	.sp db 255,0
-	.id db 1
-times 2 db 0
-cpu0:
-	.ip db 0,0
-	.0 db 0,0
-	.1 db 0,0
-	.2 db 0,0
-	.stat db 0,0
-	.flag db 0,0
-	.sp db 255,0
-	.id db 0
-
 %INCLUDE "rom.asm"
 
 nodemaster:
@@ -85,9 +55,11 @@ ret
 
 startvm:
 	call killque
+	
+	mov si,.msg
+	call print
+	mov byte[doterm],1
 
-	mov byte[startvm.comp],0
-	call loadrootdir
 	call loadroms
 	call alocallvm
 	call nodemaster
@@ -96,10 +68,16 @@ startvm:
 	mov dx,void + 3584
 	call memclear
 
+	mov byte[startvm.comp],0
+	call loadrootdir
+
+	mov byte[doterm],0
+
 	call killque
 	mov ax,shell
 	call schedule
 ret
+	.msg db 'VMHUD outputing over serial line...',13,10
 	.comp db 0,0
 
 loadroms:
