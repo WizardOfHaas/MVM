@@ -65,7 +65,7 @@ startvm:
 	call nodemaster
 
 	mov si,void + 20
-	mov dx,void + 3584
+	mov dx,void + 1024
 	call memclear
 
 	mov byte[startvm.comp],0
