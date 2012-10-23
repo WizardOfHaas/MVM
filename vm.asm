@@ -64,13 +64,11 @@ startvm:
 	call alocallvm
 	call nodemaster
 
-	mov si,void + 20
-	mov dx,void + 1024
+	mov si,word[nodemaster.cpulist]
+	mov dx,void + 3584
 	call memclear
 
 	mov byte[startvm.comp],0
-	call loadrootdir
-
 	mov byte[doterm],0
 
 	call killque
@@ -98,7 +96,6 @@ loadroms:
 	add bx,512
 	jmp .loop
 .done
-	call killvfs
 	call printret
 	popa
 ret
