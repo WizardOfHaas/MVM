@@ -71,7 +71,7 @@ startvm:
 	mov byte[startvm.comp],0
 	mov byte[doterm],0
 
-	call loadrootdir
+	call printret
 
 	call killque
 	mov ax,shell
@@ -82,7 +82,7 @@ ret
 
 loadroms:
 	pusha
-	call resetvfs
+	call loadrootdir
 	mov byte[.rom + 3],'A'
 	mov bx,void + 2048
 	mov di,.rom
