@@ -82,7 +82,10 @@ ret
 
 loadroms:
 	pusha
-	call loadrootdir
+	call getdirsec
+	call populatebfs
+	mov si,void
+	call getdump
 	mov byte[.rom + 3],'A'
 	mov bx,void + 2048
 	mov di,.rom
