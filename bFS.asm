@@ -427,11 +427,29 @@ ret
 	.SecsPerTrack dw 18
 
 getdirsec:
+	xor cx,cx
+.loop
+	cmp cx,3
+	jge .done
+	clc
+	pusha
+	call trydirsec
+	popa
+	jc .fail
+	jmp .done
+.fail
+	add cx,1
+	jmp .loop
+.done
+ret
+
+trydirsec:
 	mov ax,19
 	call l2hts
 	mov bx,void + 1024
 	mov ah,2
 	mov al,2
+	stc
 	int 13h
 ret
 

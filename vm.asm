@@ -65,7 +65,7 @@ startvm:
 	call nodemaster
 
 	mov si,void + 20
-	mov dx,void + 3584
+	mov dx,void + 1024 ;3584
 	call memclear
 
 	mov byte[startvm.comp],0
@@ -84,8 +84,6 @@ loadroms:
 	pusha
 	call getdirsec
 	call populatebfs
-	mov si,void
-	call getdump
 	mov byte[.rom + 3],'A'
 	mov bx,void + 2048
 	mov di,.rom
