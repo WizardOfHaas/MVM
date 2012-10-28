@@ -53,6 +53,33 @@ alocallvm:
 .done
 ret
 
+runrom:
+	push di
+	call killque
+	call getdirsec
+	call populatebfs
+	pop di
+	mov bx,void + 2048
+	call vfs2disk
+	cmp ax,'er'
+	je .err
+	call killvfs
+	mov ax,16
+	call maloc
+	call zeroram
+	mov si,void + 2048
+	mov di,bx
+	mov dx,0
+	call runop
+	jmp .done
+.err
+	mov ax,'fl'
+.done
+	call killque
+	mov ax,shell
+	call schedule
+ret
+
 startvm:	
 	call killque
 	
@@ -61,6 +88,7 @@ startvm:
 	mov byte[doterm],1
 
 	call loadroms
+.run
 	call alocallvm
 	call nodemaster
 

@@ -10,11 +10,8 @@ shell:
 	cmp ax,'fl'
 	jne .done
 
-	.script
-	call findfile
-	cmp ax,0
-	je .err
-	call gotask.runcmd
+	mov di,buffer
+	call runrom
 	cmp ax,'fl'
 	jne .done
 .err

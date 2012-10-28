@@ -1,6 +1,6 @@
 splash            
 db 13,10
-db 'MVM - Multi Virtual Machines',13,10
+db 'MVM - Multi Virtual Machines v0.01',13,10
 db 'Based on Dreckig Operating System',13,10,
 db 'Megalithic Kernel Research Technology',13,10,
 db 'In x86 Assembly Language',13,10,
