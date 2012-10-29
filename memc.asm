@@ -12,6 +12,12 @@ jmp .loop
 .done
 ret
 
+free:
+	mov dx,ax
+	mov si,bx
+	call memclear
+ret
+
 markfull:	
 	push ax
 	push bx 		;Mark RAM location as full
@@ -62,7 +68,7 @@ maloc:			;Allocate RAM
 	je .test
 	add si,1
 	add dx,1
-	cmp dx,void + 10000h
+	cmp dx,void + 4096
 	je .full
 	jmp .find
 .test

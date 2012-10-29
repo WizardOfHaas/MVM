@@ -67,10 +67,12 @@ runrom:
 	mov ax,16
 	call maloc
 	call zeroram
+	pusha
 	mov si,void + 2048
 	mov di,bx
 	mov dx,0
-	call runop
+	call runcpu
+	call free
 	jmp .done
 .err
 	mov ax,'fl'
@@ -148,7 +150,7 @@ runcpu:
 	jne .doint
 	call runop
 	call vmhud
-	call yield
+	;call yield
 	jmp .done
 .wait
 	call yield

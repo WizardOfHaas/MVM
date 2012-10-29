@@ -94,7 +94,7 @@ Init:
 	call printret
 
 	call loadints
-	call startvm
+	;call startvm
 
 main:			;Main command loop
 	call yield
