@@ -218,8 +218,28 @@ pullregs:
 ret
 	.base db 0,0
 
+numtasks:
+	xor ax,ax
+	push bx
+	xor bx,bx
+.loop
+	cmp bx,32
+	jge .done
+	add bx,2
+	cmp word[taskque + bx],1
+	jle .task
+	jmp .loop
+.task
+	add ax,1
+	jmp .loop
+.done
+	call getregs
+	pop bx
+ret
+
 yield:
 	pusha
+	mov byte[.fullp],0
 	mov bx,[currpid]
 	add bx,2
 .loop
@@ -230,6 +250,8 @@ yield:
 	jge .full
 	jmp .loop
 .full
+	cmp byte[.fullp],1
+	je .done
 	mov bx,taskque
 	mov byte[.fullp],1
 	jmp .loop
@@ -258,3 +280,4 @@ ret
 
 currpid db 0,0
 taskque times 32 db 0
+times 2 db 0

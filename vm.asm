@@ -150,7 +150,7 @@ runcpu:
 	jne .doint
 	call runop
 	call vmhud
-	;call yield
+	call yield
 	jmp .done
 .wait
 	call yield
