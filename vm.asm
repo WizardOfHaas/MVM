@@ -71,6 +71,10 @@ runrom:
 	mov dx,0
 	call runcpu
 	call free
+	mov bx,void + 2048
+	mov ax,void + 2048 + 512
+	call free
+	call printret
 	jmp .done
 .err
 	mov ax,'fl'
@@ -147,9 +151,9 @@ runcpu:
 	cmp byte[.int],0
 	jne .doint
 	call runop
-	;call vmhud
+	call vmhud
 	call yield
-	jmp .done
+	jmp .loop
 .wait
 	call yield
 	cmp byte[di + 9],'W'
@@ -174,6 +178,9 @@ ret
 
 vmhud:
 	pusha
+	mov ax,[doterm]
+	mov [.tmp],ax
+	mov byte[doterm],1
 	mov ax,dx
 	call tostring
 	mov si,ax
@@ -208,8 +215,11 @@ vmhud:
 	mov si,ax
 	call print
 	call printret
+	mov ax,[.tmp]
+	mov [doterm],ax
 	popa
 ret
+	.tmp db 0,0
 
 printdash:
 	pusha
