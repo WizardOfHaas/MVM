@@ -56,18 +56,16 @@ ret
 runrom:
 	push di
 	call killque
-	call getdirsec
-	call populatebfs
+	call killvfs
+	call loadrootdir
 	pop di
 	mov bx,void + 2048
 	call vfs2disk
 	cmp ax,'er'
 	je .err
-	call killvfs
 	mov ax,16
 	call maloc
 	call zeroram
-	pusha
 	mov si,void + 2048
 	mov di,bx
 	mov dx,0
@@ -149,7 +147,7 @@ runcpu:
 	cmp byte[.int],0
 	jne .doint
 	call runop
-	call vmhud
+	;call vmhud
 	call yield
 	jmp .done
 .wait

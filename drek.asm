@@ -53,7 +53,7 @@ Init:
 
 	mov si,loaddir
 	call print
-	;call loadrootdir
+	call loadrootdir
 
 	call getpit
 	mov [starttime],ax
