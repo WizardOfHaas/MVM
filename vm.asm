@@ -84,6 +84,15 @@ runrom:
 	call schedule
 ret
 
+cmdlinevm:
+	mov di,bx
+	mov bx,void + 2048
+	mov [nodemaster.cpulist],bx
+	call vfs2disk
+	call killque
+	call startvm.run
+ret
+
 startvm:	
 	call killque
 	
@@ -97,7 +106,7 @@ startvm:
 	call nodemaster
 
 	mov si,void + 20
-	mov dx,void + 1024 ;3584
+	mov dx,void + 1024
 	call memclear
 
 	mov byte[startvm.comp],0
