@@ -87,8 +87,21 @@ ret
 cmdlinevm:
 	mov di,bx
 	mov bx,void + 2048
-	mov [nodemaster.cpulist],bx
+	mov [nodemaster.romlist],bx
 	call vfs2disk
+	cmp cx,0
+	je .done
+	mov bx,void + 2560
+	mov [nodemaster.romlist + 2],bx
+	mov di,cx
+	call vfs2disk
+	cmp dx,0
+	je .done
+	mov bx,void + 3072
+	mov [nodemaster.romlist + 4],bx
+	mov di,dx
+	call vfs2disk
+.done
 	call killque
 	call startvm.run
 ret
