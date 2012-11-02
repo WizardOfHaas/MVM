@@ -17,14 +17,13 @@ shell:
 	call compare
 	jc .vm
 
-
 	mov di,buffer
 	call runrom
 	cmp ax,'fl'
 	jne .done
-
 .vm
 	call cmdlinevm
+	jmp .done
 .err
 	call err
 .done

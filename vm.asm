@@ -103,6 +103,7 @@ cmdlinevm:
 	call vfs2disk
 .done
 	call killque
+	mov byte[doterm],1
 	call startvm.run
 ret
 
