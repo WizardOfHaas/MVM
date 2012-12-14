@@ -323,10 +323,26 @@ runop:
 	je .putscreen
 	cmp byte[si],36
 	je .putregscreen
+	cmp byte[si],38
+	je .incP
+	cmp byte[si],39
+	je .decP
 	cmp byte[si],40
 	je .getkeybd
 .stop
 	mov byte[di + 9],'S'
+	jmp .done
+.incP
+	add byte[di],1
+	call calcreg
+	add di,ax
+	add byte[ram + di],1
+	jmp .done
+.decP
+	add byte[di],1
+	call calcreg
+	add di,ax
+	add byte[ram + di],1
 	jmp .done
 .mov
 	mov cx,di

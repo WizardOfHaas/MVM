@@ -185,6 +185,10 @@ getthread:		;Turns command into memory location
 	call compare
 	jc .vmcmd
 
+	mov si,bf
+	call compare
+	jc .bfcmd
+
 	.err
         mov ax,'fl'
 	
@@ -249,6 +253,9 @@ getthread:		;Turns command into memory location
 	jmp .done
 .vmcmd
 	mov ax,startvm
+	jmp .done
+.bfcmd
+	mov ax,bfcmd
 .done
 ret
 
@@ -287,6 +294,7 @@ ret
 	quit db 'quit',0
 	time db 'time',0
         info db 'info',0
+	bf db 'bf',0
 	vm db 'vm',0
         off db 'off',0
         offmsg db 13,10,'Computer Halted...',0
@@ -323,6 +331,7 @@ ret
 %INCLUDE "int.asm"
 %INCLUDE "shell.asm"
 %INCLUDE "vm.asm"
+%INCLUDE "bf.asm"
 
 print:			;Print string
 	pusha
