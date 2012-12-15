@@ -119,9 +119,9 @@ startvm:
 	call alocallvm
 	call nodemaster
 
-	mov si,void + 20
-	mov dx,void + 1024
-	call memclear
+;	mov si,void + 20
+;	mov dx,void + 1024
+;	call memclear
 
 	mov byte[startvm.comp],0
 	mov byte[doterm],0
@@ -334,15 +334,19 @@ runop:
 	jmp .done
 .incP
 	add byte[di],1
+	movzx bx,byte[si + 1]
 	call calcreg
 	add di,ax
-	add byte[ram + di],1
+	mov bx,[di]
+	add byte[ram + bx],1
 	jmp .done
 .decP
 	add byte[di],1
+	movzx bx,byte[si + 1]
 	call calcreg
 	add di,ax
-	add byte[ram + di],1
+	mov bx,[di]
+	sub byte[ram + bx],1
 	jmp .done
 .mov
 	mov cx,di
