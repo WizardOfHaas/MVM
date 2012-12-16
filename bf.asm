@@ -26,6 +26,7 @@ ret
 compbf:
 	mov di,void
 .loop
+	mov bx,[si]
 	cmp byte[si],0
 	je .done
 	push si
@@ -34,6 +35,7 @@ compbf:
 	add si,1
 	jmp .loop
 .done
+	mov byte[di],0
 ret
 
 bf2mvm:
