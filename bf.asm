@@ -37,7 +37,6 @@ compbf:
 ret
 
 bf2mvm:
-	call getregs
 	cmp byte[si],'>'
 	je .incP
 	cmp byte[si],'<'
@@ -48,6 +47,12 @@ bf2mvm:
 	je .dec
 	cmp byte[si],'.'
 	je .putchar
+	cmp byte[si],','
+	je .getchar
+	cmp byte[si],'['
+	je .setjmp
+	cmp byte[si],']'
+	je .dojmp
 	jmp .end
 .incP
 	mov byte[di],21
@@ -87,11 +92,36 @@ bf2mvm:
 	add di,1
 	mov byte[di],51
 	add di,1
+	mov byte[di],1
+	add di,1
 	mov byte[di],0
+	jmp .done
+.setjmp
+	mov byte[di],6
+	mov ax,di
+	sub ax,void
+	mov [.jmp],ax
+	jmp .done
+.dojmp
+	mov byte[di],41
 	add di,1
 	mov byte[di],1
+	add di,1
+	mov byte[di],0
+	add di,1
+	mov byte[di],8
+	add di,1
+	mov byte[di],1
+	add di,1
+	mov byte[di],0
+	add di,1
+	mov byte[di],10
+	add di,1
+	mov ax,[.jmp]
+	mov byte[di],al
 	jmp .done
 .done
 	add di,1
 .end
 ret
+	.jmp dw 0
